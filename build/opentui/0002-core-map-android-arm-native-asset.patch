@@ -1,0 +1,29 @@
+diff --git a/packages/core/src/node-asset-target.ts b/packages/core/src/node-asset-target.ts
+index 4697e21..4036ea1 100644
+--- a/packages/core/src/node-asset-target.ts
++++ b/packages/core/src/node-asset-target.ts
+@@ -1,6 +1,6 @@
+ export type NodeAssetTarget = {
+-  readonly platform: "darwin" | "linux" | "win32"
+-  readonly arch: "arm64" | "x64"
++  readonly platform: "darwin" | "linux" | "win32" | "android"
++  readonly arch: "arm" | "arm64" | "x64"
+   readonly libc?: "glibc" | "musl"
+ }
+ 
+@@ -11,13 +11,14 @@ export interface NativeAssetDescriptor {
+ }
+ 
+ const NATIVE_FILE_NAMES = {
++  android: "libopentui.so",
+   darwin: "libopentui.dylib",
+   linux: "libopentui.so",
+   win32: "opentui.dll",
+ } as const
+ 
+ export function getNativeAssetDescriptor(target: NodeAssetTarget): NativeAssetDescriptor {
+-  if (!Object.hasOwn(NATIVE_FILE_NAMES, target.platform) || (target.arch !== "arm64" && target.arch !== "x64")) {
++  if (!Object.hasOwn(NATIVE_FILE_NAMES, target.platform) || !["arm", "arm64", "x64"].includes(target.arch)) {
+     throw new Error(`Unsupported OpenTUI Node asset target: ${String(target.platform)}-${String(target.arch)}`)
+   }
+ 
