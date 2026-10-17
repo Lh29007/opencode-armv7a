@@ -1,0 +1,10 @@
+#!/data/data/com.termux/files/usr/bin/sh
+# Launcher for the headless OpenCode server (installed at $PREFIX/bin/opencode).
+PREFIX=/data/data/com.termux/files/usr
+NODE="$PREFIX/bin/node"
+HERE="$PREFIX/lib/opencode"
+FLAGS=""
+if "$NODE" --experimental-ffi -e "" >/dev/null 2>&1; then FLAGS="--experimental-ffi"; fi
+export OPENCODE_DISABLE_FILEWATCHER="${OPENCODE_DISABLE_FILEWATCHER:-1}"
+export OPENCODE_DISABLE_FFF="${OPENCODE_DISABLE_FFF:-1}"
+exec "$NODE" $FLAGS --disable-warning=ExperimentalWarning "$HERE/opencode.mjs" "$@"

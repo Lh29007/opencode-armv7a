@@ -1,0 +1,6 @@
+out/
+dist-headless/
+dist-node/
+dist-nomin/
+node_modules/
+*.deb
