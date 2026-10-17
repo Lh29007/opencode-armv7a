@@ -1,6 +1,7 @@
 #!/bin/sh
 # Builds libopentui.so (Zig) for 32-bit ARM, with our patches applied on top of anomalyco/opentui v0.5.17.
-# Output: out/opentui/arm-linux-musleabihf/libopentui.so
+# TARGET=glibc (default, for a Debian proot) or TARGET=musl.
+# Output: out/opentui/<target>/libopentui.so
 # Needs: git, Python 3 with `pip install ziglang==0.16.0` available (or a zig 0.16 on PATH via ZIG env var).
 set -eu
 HERE=$(cd "$(dirname "$0")/.." && pwd)
@@ -15,7 +16,12 @@ git apply "$HERE/build/opentui/0002-core-map-android-arm-native-asset.patch"
 cd packages/native
 sh scripts/prepare-zig-deps.sh
 ZIG=${ZIG:-"python3 -m ziglang"}
-$ZIG build -Doptimize=ReleaseFast -Dlibrary-target=arm-linux-musleabihf
-mkdir -p "$HERE/out/opentui/arm-linux-musleabihf"
-cp lib/arm-linux-musleabihf/libopentui.so "$HERE/out/opentui/arm-linux-musleabihf/"
-echo "built: $HERE/out/opentui/arm-linux-musleabihf/libopentui.so"
+case "${TARGET:-glibc}" in
+  glibc) ZT=arm-linux-gnueabihf.2.31 ;;
+  musl)  ZT=arm-linux-musleabihf ;;
+  *) echo "TARGET must be glibc or musl" >&2; exit 1 ;;
+esac
+$ZIG build -Doptimize=ReleaseFast -Dlibrary-target=$ZT
+mkdir -p "$HERE/out/opentui/$ZT"
+cp "lib/$ZT/libopentui.so" "$HERE/out/opentui/$ZT/"
+echo "built: $HERE/out/opentui/$ZT/libopentui.so"
